@@ -1,0 +1,1146 @@
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 1
+
+
+
+
+
+       MCS-51 Family Macro Assembler   A S E M - 5 1   V 1.3
+       =====================================================
+
+
+
+	Source File:	E:\IUT\7th semester\EEE-4706\project\finalised files\speed control of dc motor_A1_G2.asm
+	Object File:	E:\IUT\7th semester\EEE-4706\project\finalised files\speed control of dc motor_A1_G2.hex
+	List File:	E:\IUT\7th semester\EEE-4706\project\finalised files\speed control of dc motor_A1_G2.lst
+
+
+
+ Line  I  Addr  Code            Source
+
+    1:		N      0000	ORG 0000H
+    2:	  0000	75 81 70	MOV SP, #70H
+    3:	  0003	75 D0 00	MOV PSW, #00H
+    4:		B      0084	LED EQU P0.4 ; Define BUZZER pin
+    5:		B      0080	LED25 EQU P0.0
+    6:		B      0081	LED50 EQU P0.1
+    7:		B      0082	LED75 EQU P0.2
+    8:		B      0083	LED100 EQU P0.3
+    9:				;-------------------------------------------------------------
+   10:		B      0091	RS EQU P1.1
+   11:		B      0092	EN EQU P1.2
+   12:				;-------------------------------------------------------------
+   13:	  0006			INITIALIZATION:
+   14:	  0006	75 80 00	MOV P0, #00H
+   15:	  0009	75 90 00	MOV P1, #00H
+   16:	  000C	75 A0 00	MOV P2, #00H
+   17:	  000F	75 B0 FE	MOV P3, #0FEH ;11111110
+   18:				;-------------------------------------------------------------
+   19:
+   20:				;--------------------------------------------------------------
+   21:	  0012			LCD_INIT:
+   22:	  0012	7A 38		MOV R2, #38H ;INITIALIZING LCD, 2 LINES, 5X7 MATRIX
+   23:	  0014	11 B1		ACALL COMMAND ;CALLING COMMAND SUBROUTINE
+   24:
+   25:	  0016	7A 0E		MOV R2, #0EH ;DISPLAY ON, CURSOR ON
+   26:	  0018	11 B1		ACALL COMMAND
+   27:
+   28:	  001A	7A 01		MOV R2, #01H ;CLEARING SCREEN
+   29:	  001C	11 B1		ACALL COMMAND
+   30:	  001E	74 06		MOV A,#06H ;INCREMENT CURSOR POSITION
+   31:	  0020	11 B1		ACALL COMMAND
+   32:	  0022	7A 80		MOV R2, #80H ;CURSOR AT START OF 1ST LINE
+   33:	  0024	11 B1		ACALL COMMAND
+   34:	  0026	74 3C		MOV A,#3CH
+   35:	  0028	11 B1		ACALL COMMAND
+   36:	  002A	90 05 68	MOV DPTR,#MSG ;Display Starting message
+   37:	  002D	11 94		ACALL LCD_PRINT ;Subroutine for displaying in LCD
+   38:	  002F	90 05 71	MOV DPTR,#MSG2
+   39:	  0032	11 94		ACALL LCD_PRINT
+   40:	  0034	7A 01		MOV R2,#01H
+   41:	  0036	11 B1		ACALL COMMAND
+   42:	  0038	90 05 7D	MOV DPTR,#MSG3 ;Display Starting message
+   43:	  003B	11 94		ACALL LCD_PRINT ;Subroutine for displaying in LCD
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 2
+
+
+
+ Line  I  Addr  Code            Source
+
+   44:	  003D	90 05 82	MOV DPTR,#MSG4
+   45:	  0040	11 94		ACALL LCD_PRINT
+   46:
+   47:	  0042	7A 01		MOV R2,#01H
+   48:	  0044	11 B1		ACALL COMMAND
+   49:	  0046	90 05 89	MOV DPTR,#MSG5 ;Display Starting message
+   50:	  0049	11 94		ACALL LCD_PRINT ;Subroutine for displaying in LCD
+   51:	  004B	90 05 90	MOV DPTR,#MSG6
+   52:	  004E	11 94		ACALL LCD_PRINT
+   53:
+   54:	  0050	7A 01		MOV R2,#01H
+   55:	  0052	11 B1		ACALL COMMAND
+   56:	  0054	90 05 97	MOV DPTR,#MSG7 ;Display Starting message
+   57:	  0057	11 94		ACALL LCD_PRINT ;Subroutine for displaying in LCD
+   58:	  0059	90 05 9F	MOV DPTR,#MSG8
+   59:	  005C	11 94		ACALL LCD_PRINT
+   60:
+   61:	  005E	7A 01		MOV R2,#01H
+   62:	  0060	11 B1		ACALL COMMAND
+   63:	  0062	90 05 A6	MOV DPTR,#MSG9 ;Display Starting message
+   64:	  0065	11 94		ACALL LCD_PRINT ;Subroutine for displaying in LCD
+   65:	  0067	90 05 AC	MOV DPTR,#MSG10
+   66:	  006A	11 94		ACALL LCD_PRINT
+   67:
+   68:	  006C	7A 01		MOV R2,#01H
+   69:	  006E	11 B1		ACALL COMMAND
+   70:	  0070	90 05 B3	MOV DPTR,#MSG11 ;Display Starting message
+   71:	  0073	11 94		ACALL LCD_PRINT ;Subroutine for displaying in LCD
+   72:	  0075	90 05 BC	MOV DPTR,#MSG12
+   73:	  0078	11 94		ACALL LCD_PRINT
+   74:
+   75:	  007A	7A 01		MOV R2, #01H
+   76:	  007C	11 B1		ACALL COMMAND
+   77:	  007E	90 05 E6	MOV DPTR,#START1 ;Display Starting message
+   78:	  0081	11 94		ACALL LCD_PRINT ;Subroutine for displaying in LCD
+   79:	  0083	90 05 F4	MOV DPTR,#START2
+   80:	  0086	11 94		ACALL LCD_PRINT
+   81:	  0088	7A 01		MOV R2, #01H
+   82:	  008A	11 B1		ACALL COMMAND
+   83:	  008C	90 06 0F	MOV DPTR,#ACTIVE
+   84:	  008F	11 94		ACALL LCD_PRINT
+   85:	  0091	02 00 CB	LJMP DECISION
+   86:
+   87:				;LCD display subroutine-----------------------------------------
+   88:	  0094			LCD_PRINT:
+   89:	  0094			LOOP:
+   90:	  0094	E4		CLR A
+   91:	  0095	93		MOVC A, @A+DPTR
+   92:	  0096	FA		MOV R2, A
+   93:	  0097	60 08		JZ EXIT ;stop writing when null char is detected
+   94:	  0099	11 A6		ACALL DISPLAY ;main display part
+   95:	  009B	11 BE		ACALL DELAY ;giving a short delay for LCD
+   96:	  009D	A3		INC DPTR
+   97:	  009E	02 00 94	LJMP LOOP
+   98:	  00A1			EXIT:
+   99:	  00A1	7A C0		MOV R2, #0C0H ;go to the 2nd line of LCD
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 3
+
+
+
+ Line  I  Addr  Code            Source
+
+  100:	  00A3	11 B1		ACALL COMMAND
+  101:	  00A5	22		RET
+  102:
+  103:	  00A6			DISPLAY:
+  104:	  00A6	8A A0		MOV P2, R2 ;subroutine for displaying in LCD
+  105:	  00A8	D2 91		SETB RS ;RW is grounded in Hardware
+  106:	  00AA	D2 92		SETB EN
+  107:	  00AC	11 BE		ACALL DELAY
+  108:	  00AE	C2 92		CLR EN
+  109:	  00B0	22		RET
+  110:				;---------------------------------------------------------------
+  111:	  00B1			COMMAND:
+  112:	  00B1	8A A0		MOV P2, R2 ;giving instructions to LCD
+  113:	  00B3	C2 91		CLR RS
+  114:	  00B5	D2 92		SETB EN
+  115:	  00B7	11 BE		ACALL DELAY
+  116:	  00B9	C2 92		CLR EN
+  117:	  00BB	11 BE		ACALL DELAY
+  118:	  00BD	22		RET
+  119:				;---------------------------------------------------------------
+  120:	  00BE			DELAY:
+  121:	  00BE	75 52 64	MOV 52H, #100 ;50 ms delay (approx)
+  122:	  00C1	75 51 FF	D1: MOV 51H, #255
+  123:	  00C4	D5 51 FD	DJNZ 51H, $
+  124:	  00C7	D5 52 F7	DJNZ 52H, D1
+  125:	  00CA	22		RET
+  126:				;---------------------------------------------------------------
+  127:
+  128:				;---------------------------------------------------------------
+  129:	  00CB			DECISION:
+  130:	  00CB	02 00 CE	LJMP MOTOR_ROTATION ;Start Motor part
+  131:
+  132:				;MOTOR PART------------------------------------------------------
+  133:	  00CE			MOTOR_ROTATION:
+  134:	  00CE	D2 90		SETB P1.0
+  135:	  00D0	D2 93		SETB P1.3 ;Input to motor driver
+  136:	  00D2	C2 94		CLR P1.4 ;Clockwise direction
+  137:				;---------------------------------------------------------------
+  138:	  00D4			STARTUP_MOTOR:
+  139:	  00D4	7A 01		MOV R2, #01H
+  140:	  00D6	11 B1		ACALL COMMAND
+  141:	  00D8	90 04 F0	MOV DPTR, #INT_MSG ;print 'ENTER RPM LEVEL'
+  142:	  00DB	12 00 94	LCALL LCD_PRINT
+  143:	  00DE	7A 01		MOV R2, #01H
+  144:	  00E0	11 B1		ACALL COMMAND
+  145:	  00E2	90 06 1B	MOV DPTR, #LEVEL ;print 'LEVEL: 1 TO A'
+  146:	  00E5	12 00 94	LCALL LCD_PRINT
+  147:	  00E8	12 00 BE	LCALL DELAY
+  148:	  00EB	90 06 2A	MOV DPTR, #STOP ;print 'PRESS 0 TO STOP'
+  149:	  00EE	12 00 94	LCALL LCD_PRINT
+  150:	  00F1	90 06 5C	MOV DPTR, #ACLCL
+  151:	  00F4	12 00 94	LCALL LCD_PRINT
+  152:
+  153:				;keyboard RPM Input Scanning------------------------------------
+  154:				;---------------------------------------------------------------
+  155:				;SCANNING ALL COLUMN ------------------------------------------
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 4
+
+
+
+ Line  I  Addr  Code            Source
+
+  156:	  00F7			ML:
+  157:	  00F7	30 B0 0B	JNB P3.0, CC1
+  158:	  00FA	30 B1 1A	JNB P3.1, CC2
+  159:	  00FD	30 B2 29	JNB P3.2, CC3
+  160:	  0100	30 B3 38	JNB P3.3, CC4
+  161:	  0103	80 F2		SJMP ML
+  162:				;---------------------------------------------------------------
+  163:				;SCANNING COLUMN1 ----------------------------------------------
+  164:	  0105			CC1:
+  165:	  0105	30 B4 49	JNB P3.4, JMP_TO_1
+  166:	  0108	30 B5 49	JNB P3.5, JMP_TO_2
+  167:	  010B	30 B6 49	JNB P3.6, JMP_TO_3
+  168:	  010E	30 B7 5B	JNB P3.7, JMP_TO_A
+  169:
+  170:	  0111	D2 B0		SETB P3.0
+  171:	  0113	C2 B1		CLR P3.1
+  172:	  0115	80 E0		SJMP ML
+  173:				;SCANNING COLUMN2 ---------------------------------------------
+  174:
+  175:	  0117			CC2:
+  176:	  0117	30 B4 40	JNB P3.4, JMP_TO_4
+  177:	  011A	30 B5 40	JNB P3.5, JMP_TO_5
+  178:	  011D	30 B6 40	JNB P3.6, JMP_TO_6
+  179:	  0120	30 B7 4C	JNB P3.7, JMP_TO_B
+  180:
+  181:	  0123	D2 B1		SETB P3.1
+  182:	  0125	C2 B2		CLR P3.2
+  183:	  0127	80 CE		SJMP ML
+  184:				;SCANNING COLUMN3 ---------------------------------------------
+  185:
+  186:	  0129			CC3:
+  187:	  0129	30 B4 37	JNB P3.4, JMP_TO_7
+  188:	  012C	30 B5 37	JNB P3.5, JMP_TO_8
+  189:	  012F	30 B6 37	JNB P3.6, JMP_TO_9
+  190:	  0132	30 B7 3D	JNB P3.7, JMP_TO_C
+  191:
+  192:	  0135	D2 B2		SETB P3.2
+  193:	  0137	C2 B3		CLR P3.3
+  194:	  0139	80 BC		SJMP ML
+  195:				;SCANNING COLUMN4 ---------------------------------------------
+  196:
+  197:	  013B			CC4:
+  198:	  013B	30 B4 3D	JNB P3.4, JMP_TO_F
+  199:	  013E	30 B5 0D	JNB P3.5, JMP_TO_0
+  200:	  0141	30 B6 34	JNB P3.6, JMP_TO_E
+  201:	  0144	30 B7 2E	JNB P3.7, JMP_TO_D
+  202:
+  203:	  0147	D2 B3		SETB P3.3
+  204:	  0149	C2 B0		CLR P3.0
+  205:	  014B	02 00 F7	LJMP ML
+  206:				;---------------------------------------------------------------
+  207:	  014E	02 01 7E	JMP_TO_0: LJMP M_0 ;MOTOR OFF
+  208:	  0151	02 01 8F	JMP_TO_1: LJMP M_1 ;LEVEL 1
+  209:	  0154	02 01 A3	JMP_TO_2: LJMP M_2 ;LEVEL 2
+  210:	  0157	02 01 B7	JMP_TO_3: LJMP M_3 ;LEVEL 3
+  211:	  015A	02 00 F7	JMP_TO_4: LJMP ML ;NOT NEEDED
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 5
+
+
+
+ Line  I  Addr  Code            Source
+
+  212:	  015D	02 00 F7	JMP_TO_5: LJMP ML ;continue scanning
+  213:	  0160	02 00 F7	JMP_TO_6: LJMP ML
+  214:	  0163	02 00 F7	JMP_TO_7: LJMP ML
+  215:	  0166	02 00 F7	JMP_TO_8: LJMP ML
+  216:	  0169	02 00 F7	JMP_TO_9: LJMP ML
+  217:	  016C	02 01 CB	JMP_TO_A: LJMP M_A ;LEVEL 4
+  218:	  016F	02 00 F7	JMP_TO_B: LJMP ML
+  219:	  0172	02 00 F7	JMP_TO_C: LJMP ML
+  220:	  0175	02 00 F7	JMP_TO_D: LJMP ML
+  221:	  0178	02 01 F9	JMP_TO_E: LJMP M_E ;CLOCKWISE
+  222:	  017B	02 01 DF	JMP_TO_F: LJMP M_F ;ANTI-CLOCKWISE
+  223:				;---------------------------------------------------------------
+  224:
+  225:	  017E			M_0:
+  226:	  017E	30 B5 FD	JNB P3.5,M_0 ;wait for key release
+  227:	  0181	7A 01		MOV R2, #01H
+  228:	  0183	11 B1		ACALL COMMAND ;clear LCD screen
+  229:	  0185	90 05 00	MOV DPTR, #OFF_MSG ;display 'Motor off'
+  230:	  0188	11 94		ACALL LCD_PRINT
+  231:	  018A	02 02 26	LJMP MOTOR_0 ;MOTOR OFF STATE
+  232:	  018D	C2 84		CLR LED ; Turn off LED when '0' is pressed
+  233:	  018F			M_1:
+  234:	  018F	30 B4 FD	JNB P3.4,M_1
+  235:	  0192	7A 01		MOV R2, #01H
+  236:	  0194	11 B1		ACALL COMMAND
+  237:	  0196	90 05 0A	MOV DPTR, #LVL1
+  238:	  0199	11 94		ACALL LCD_PRINT
+  239:	  019B	90 06 2A	MOV DPTR, #STOP
+  240:	  019E	11 94		ACALL LCD_PRINT
+  241:	  01A0	02 02 58	LJMP MOTOR_1 ;RPM LEVEL 1
+  242:
+  243:	  01A3			M_2:
+  244:	  01A3	30 B5 FD	JNB P3.5,M_2
+  245:	  01A6	7A 01		MOV R2, #01H
+  246:	  01A8	11 B1		ACALL COMMAND
+  247:	  01AA	90 05 1A	MOV DPTR, #LVL2
+  248:	  01AD	11 94		ACALL LCD_PRINT
+  249:	  01AF	90 06 2A	MOV DPTR, #STOP
+  250:	  01B2	11 94		ACALL LCD_PRINT
+  251:	  01B4	02 03 28	LJMP MOTOR_2 ;RPM LEVEL 2
+  252:
+  253:	  01B7			M_3:
+  254:	  01B7	30 B6 FD	JNB P3.6,M_3
+  255:	  01BA	7A 01		MOV R2, #01H
+  256:	  01BC	11 B1		ACALL COMMAND
+  257:	  01BE	90 05 2C	MOV DPTR, #LVL3
+  258:	  01C1	11 94		ACALL LCD_PRINT
+  259:	  01C3	90 06 2A	MOV DPTR, #STOP
+  260:	  01C6	11 94		ACALL LCD_PRINT
+  261:	  01C8	02 03 D2	LJMP MOTOR_3 ;RPM LEVEL 3
+  262:
+  263:	  01CB			M_A:
+  264:	  01CB	30 B7 FD	JNB P3.7,M_A
+  265:	  01CE	7A 01		MOV R2, #01H
+  266:	  01D0	11 B1		ACALL COMMAND
+  267:	  01D2	90 05 3E	MOV DPTR, #LVL4
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 6
+
+
+
+ Line  I  Addr  Code            Source
+
+  268:	  01D5	11 94		ACALL LCD_PRINT
+  269:	  01D7	90 06 2A	MOV DPTR, #STOP
+  270:	  01DA	11 94		ACALL LCD_PRINT
+  271:	  01DC	02 04 65	LJMP MOTOR_4 ;RPM LEVEL 4
+  272:				;---------------------------------------------------------------
+  273:	  01DF			M_F:
+  274:	  01DF	30 B4 FD	JNB P3.4,M_F
+  275:	  01E2	7A 01		MOV R2, #01H
+  276:	  01E4	11 B1		ACALL COMMAND
+  277:	  01E6	90 05 59	MOV DPTR, #ANTICLK ;Display 'Anticlockwise'
+  278:	  01E9	11 94		ACALL LCD_PRINT
+  279:	  01EB	90 06 4B	MOV DPTR, #CLM
+  280:	  01EE	11 94		ACALL LCD_PRINT
+  281:	  01F0	D2 90		SETB P1.0
+  282:	  01F2	D2 94		SETB P1.4 ;anticlockwise rotation
+  283:	  01F4	C2 93		CLR P1.3
+  284:	  01F6	02 00 F7	LJMP ML ;scan for new input
+  285:
+  286:	  01F9			M_E:
+  287:	  01F9	30 B6 FD	JNB P3.6,M_E
+  288:	  01FC	7A 01		MOV R2, #01H
+  289:	  01FE	11 B1		ACALL COMMAND
+  290:	  0200	90 05 4F	MOV DPTR, #CLKWISE
+  291:	  0203	11 94		ACALL LCD_PRINT
+  292:	  0205	90 06 4B	MOV DPTR, #CLM
+  293:	  0208	11 94		ACALL LCD_PRINT
+  294:	  020A	D2 90		SETB P1.0
+  295:	  020C	D2 93		SETB P1.3 ;clockwise rotation (In1=1,In2=0)
+  296:	  020E	C2 94		CLR P1.4
+  297:	  0210	02 00 F7	LJMP ML
+  298:				;---------------------------------------------------------------
+  299:				;Delay subroutine for PWM
+  300:				;---------------------------------------------------------------
+  301:	  0213			DELAYM:
+  302:	  0213	7D 01		MOV R5, #1
+  303:	  0215	7C 64		Hl: MOV R4, #100
+  304:	  0217	7B FF		H2: MOV R3, #255
+  305:	  0219	DB FE		H3: DJNZ R3, H3
+  306:	  021B	DC FA		DJNZ R4, H2
+  307:	  021D	DD F6		DJNZ R5, Hl
+  308:	  021F	22		RET
+  309:				;---------------------------------------------------------------
+  310:	  0220	75 B0 FE	LC: MOV P3, #0FEH ;INITIAL CONDITION
+  311:	  0223	02 00 F7	LJMP ML ;SCAN KEYPAD AGAIN
+  312:				;---------------------------------------------------------------
+  313:	  0226			MOTOR_0:
+  314:	  0226	C2 90		CLR P1.0 ;MOTOR OFF
+  315:	  0228	C2 93		CLR P1.3
+  316:	  022A	C2 94		CLR P1.4
+  317:	  022C	30 B4 26	JNB P3.4,LL ;JNB IS SHORT JUMP,
+  318:	  022F	30 B5 23	JNB P3.5,LL ;SO LL IS USED AS AN INTERMEDIATE STAGE
+  319:	  0232	30 B6 20	JNB P3.6,LL
+  320:	  0235	30 B7 1D	JNB P3.7,LL
+  321:	  0238	D2 B0		SETB P3.0
+  322:	  023A	C2 B3		CLR P3.3 ;CHECK ROW 4 (* 0 # D)
+  323:	  023C	30 B4 E1	JNB P3.4,LC ;'*' PRESSED
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 7
+
+
+
+ Line  I  Addr  Code            Source
+
+  324:	  023F	30 B5 DE	JNB P3.5,LC ;'0' PRESSED
+  325:	  0242	30 B6 DB	JNB P3.6,LC ;'#' PRESSED
+  326:	  0245	D2 B3		SETB P3.3
+  327:	  0247	C2 84		CLR LED ; Turn off LED when '0' is pressed
+  328:	  0249	C2 80		CLR LED25
+  329:	  024B	C2 81		CLR LED50
+  330:	  024D	C2 82		CLR LED75
+  331:	  024F	C2 83		CLR LED100
+  332:	  0251	C2 B0		CLR P3.0 ;AGAIN CHECK ROW 1(1 2 3 A)
+  333:	  0253	80 D1		SJMP MOTOR_0
+  334:				;---------------------------------------------------------------
+  335:	  0255	02 00 F7	LL: LJMP ML ;JUMP TO L1
+  336:				;---------------------------------------------------------------
+  337:	  0258			MOTOR_1: ;25% DUTY CYCLE
+  338:	  0258	D2 80		SETB LED25
+  339:	  025A	C2 81		CLR LED50
+  340:	  025C	C2 82		CLR LED75
+  341:	  025E	C2 83		CLR LED100
+  342:	  0260	C2 84		CLR LED
+  343:	  0262	D2 90		SETB P1.0
+  344:	  0264	D2 93		SETB P1.3
+  345:	  0266	C2 94		CLR P1.4
+  346:	  0268	51 13		ACALL DELAYM
+  347:	  026A	C2 93		CLR P1.3
+  348:	  026C	C2 94		CLR P1.4
+  349:	  026E	51 13		ACALL DELAYM
+  350:	  0270	51 13		ACALL DELAYM
+  351:	  0272	51 13		ACALL DELAYM
+  352:	  0274	51 13		ACALL DELAYM
+  353:	  0276	30 B4 DC	JNB P3.4,LL ;CHECK FOR NEW INPUT
+  354:	  0279	30 B5 D9	JNB P3.5,LL ;KEY 1,2,3,A FOR LEVEL 1-4
+  355:	  027C	30 B6 D6	JNB P3.6,LL
+  356:	  027F	30 B7 D3	JNB P3.7,LL
+  357:	  0282	D2 B0		SETB P3.0
+  358:	  0284	C2 B3		CLR P3.3
+  359:	  0286	30 B4 2C	JNB P3.4,ACL1_1 ;'*' FOR ANTI-CLOCKWISE
+  360:	  0289	30 B5 94	JNB P3.5,LC ;GO OUT WHEN '0' IS PRESSED
+  361:	  028C	30 B6 29	JNB P3.6,CL1_1 ;# FOR CLOCKWISE
+  362:	  028F	D2 B3		SETB P3.3
+  363:	  0291	C2 B0		CLR P3.0
+  364:
+  365:	  0293	7A 01		MOV R2,#01H
+  366:	  0295	11 B1		ACALL COMMAND
+  367:	  0297	90 05 C3	MOV DPTR,#MSG13 ;Display Starting message
+  368:	  029A	11 94		ACALL LCD_PRINT ;Subroutine for displaying in LCD
+  369:	  029C	90 05 C3	MOV DPTR,#MSG13
+  370:	  029F	11 94		ACALL LCD_PRINT
+  371:
+  372:	  02A1	7A 01		MOV R2,#01H
+  373:	  02A3	11 B1		ACALL COMMAND
+  374:	  02A5	90 05 CE	MOV DPTR,#MSG14 ;Display Starting message
+  375:	  02A8	11 94		ACALL LCD_PRINT ;Subroutine for displaying in LCD
+  376:	  02AA	90 05 DC	MOV DPTR,#MSG15
+  377:	  02AD	11 94		ACALL LCD_PRINT
+  378:				;JNB P1.0, LIM1
+  379:	  02AF	02 01 7E	LJMP M_0
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 8
+
+
+
+ Line  I  Addr  Code            Source
+
+  380:
+  381:	  02B2	02 02 20	LC1_2: LJMP LC
+  382:	  02B5	02 03 23	ACL1_1:LJMP ACL1
+  383:	  02B8	02 03 1E	CL1_1: LJMP CL1
+  384:	  02BB	02 02 55	LL_2:LJMP LL
+  385:
+  386:	  02BE			MOTOR_1_ACL: ;25% DUTY CYCLE
+  387:	  02BE	D2 80		SETB LED25
+  388:	  02C0	C2 81		CLR LED50
+  389:	  02C2	C2 82		CLR LED75
+  390:	  02C4	C2 83		CLR LED100
+  391:	  02C6	C2 84		CLR LED
+  392:	  02C8	D2 90		SETB P1.0
+  393:	  02CA	D2 94		SETB P1.4
+  394:	  02CC	C2 93		CLR P1.3
+  395:	  02CE	51 13		ACALL DELAYM
+  396:	  02D0	C2 94		CLR P1.4
+  397:	  02D2	C2 93		CLR P1.3
+  398:	  02D4	51 13		ACALL DELAYM
+  399:	  02D6	51 13		ACALL DELAYM
+  400:	  02D8	51 13		ACALL DELAYM
+  401:	  02DA	51 13		ACALL DELAYM
+  402:	  02DC	30 B4 DC	JNB P3.4,LL_2 ;CHECK FOR NEW INPUT
+  403:	  02DF	30 B5 D9	JNB P3.5,LL_2 ;KEY 1,2,3,A FOR LEVEL 1-4
+  404:	  02E2	30 B6 D6	JNB P3.6,LL_2
+  405:	  02E5	30 B7 D3	JNB P3.7,LL_2
+  406:	  02E8	D2 B0		SETB P3.0
+  407:	  02EA	C2 B3		CLR P3.3
+  408:	  02EC	30 B4 34	JNB P3.4,ACL1 ;'*' FOR ANTI-CLOCKWISE
+  409:	  02EF	30 B5 C0	JNB P3.5,LC1_2 ;GO OUT WHEN '0' IS PRESSED
+  410:	  02F2	30 B6 29	JNB P3.6,CL1 ;# FOR CLOCKWISE
+  411:	  02F5	D2 B3		SETB P3.3
+  412:	  02F7	C2 B0		CLR P3.0
+  413:
+  414:	  02F9	7A 01		MOV R2,#01H
+  415:	  02FB	11 B1		ACALL COMMAND
+  416:	  02FD	90 05 C3	MOV DPTR,#MSG13 ;Display Starting message
+  417:	  0300	11 94		ACALL LCD_PRINT ;Subroutine for displaying in LCD
+  418:	  0302	90 05 C3	MOV DPTR,#MSG13
+  419:	  0305	11 94		ACALL LCD_PRINT
+  420:
+  421:	  0307	7A 01		MOV R2,#01H
+  422:	  0309	11 B1		ACALL COMMAND
+  423:	  030B	90 05 CE	MOV DPTR,#MSG14 ;Display Starting message
+  424:	  030E	11 94		ACALL LCD_PRINT ;Subroutine for displaying in LCD
+  425:	  0310	90 05 DC	MOV DPTR,#MSG15
+  426:	  0313	11 94		ACALL LCD_PRINT
+  427:
+  428:				;JNB P1.0, LIM1A
+  429:	  0315	02 01 7E	LJMP M_0
+  430:
+  431:
+  432:				;---------------------------------------------------------------
+  433:	  0318	02 02 55	LL_1: LJMP LL
+  434:	  031B	02 02 B2	LC1_1: LJMP LC1_2
+  435:				;......................................
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 9
+
+
+
+ Line  I  Addr  Code            Source
+
+  436:	  031E	71 B4		CL1:ACALL CL_MAIN ;FOR CLOCKWISE ROTATION
+  437:	  0320	02 02 58	LJMP MOTOR_1 ;CONTINUE SAME RPM LEVEL
+  438:	  0323	71 C3		ACL1:ACALL ACL_MAIN
+  439:	  0325	02 02 BE	LJMP MOTOR_1_ACL
+  440:				;---------------------------------------------------------------
+  441:	  0328			MOTOR_2: ;50% DUTY CYCLE
+  442:	  0328	C2 80		CLR LED25
+  443:	  032A	C2 82		CLR LED75
+  444:	  032C	C2 83		CLR LED100
+  445:	  032E	C2 84		CLR LED
+  446:	  0330	D2 81		SETB LED50
+  447:	  0332	D2 90		SETB P1.0
+  448:	  0334	D2 93		SETB P1.3
+  449:	  0336	C2 94		CLR P1.4
+  450:	  0338	51 13		ACALL DELAYM
+  451:	  033A	51 13		ACALL DELAYM
+  452:	  033C	C2 93		CLR P1.3
+  453:	  033E	C2 94		CLR P1.4
+  454:	  0340	51 13		ACALL DELAYM
+  455:	  0342	51 13		ACALL DELAYM
+  456:	  0344	30 B4 D1	JNB P3.4,LL_1
+  457:	  0347	30 B5 CE	JNB P3.5,LL_1
+  458:	  034A	30 B6 CB	JNB P3.6,LL_1
+  459:	  034D	30 B7 C8	JNB P3.7,LL_1
+  460:	  0350	D2 B0		SETB P3.0
+  461:	  0352	C2 B3		CLR P3.3
+  462:	  0354	30 B4 0F	JNB P3.4,ACL2_1 ;'*' pressed
+  463:	  0357	30 B5 C1	JNB P3.5,LC1_1
+  464:	  035A	30 B6 0C	JNB P3.6,CL2_1
+  465:	  035D	D2 B3		SETB P3.3
+  466:	  035F	C2 B0		CLR P3.0
+  467:	  0361	80 C5		SJMP MOTOR_2
+  468:
+  469:	  0363	02 03 18	LL_12:LJMP LL_1
+  470:
+  471:	  0366	02 03 AC	ACL2_1: LJMP ACL2
+  472:	  0369	02 03 A7	CL2_1: LJMP CL2
+  473:
+  474:	  036C			MOTOR_2_ACL: ;50% DUTY CYCLE
+  475:	  036C	C2 80		CLR LED25
+  476:	  036E	C2 82		CLR LED75
+  477:	  0370	C2 83		CLR LED100
+  478:	  0372	C2 84		CLR LED
+  479:	  0374	D2 81		SETB LED50
+  480:	  0376	D2 90		SETB P1.0
+  481:	  0378	D2 94		SETB P1.4
+  482:	  037A	C2 93		CLR P1.3
+  483:	  037C	51 13		ACALL DELAYM
+  484:	  037E	51 13		ACALL DELAYM
+  485:	  0380	C2 94		CLR P1.4
+  486:	  0382	C2 93		CLR P1.3
+  487:	  0384	51 13		ACALL DELAYM
+  488:	  0386	51 13		ACALL DELAYM
+  489:	  0388	30 B4 D8	JNB P3.4,LL_12
+  490:	  038B	30 B5 D5	JNB P3.5,LL_12
+  491:	  038E	30 B6 D2	JNB P3.6,LL_12
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 10
+
+
+
+ Line  I  Addr  Code            Source
+
+  492:	  0391	30 B7 CF	JNB P3.7,LL_12
+  493:	  0394	D2 B0		SETB P3.0
+  494:	  0396	C2 B3		CLR P3.3
+  495:	  0398	30 B4 11	JNB P3.4,ACL2 ;'*' pressed
+  496:	  039B	30 B5 13	JNB P3.5,LC1
+  497:	  039E	30 B6 06	JNB P3.6,CL2
+  498:	  03A1	D2 B3		SETB P3.3
+  499:	  03A3	C2 B0		CLR P3.0
+  500:	  03A5	80 C5		SJMP MOTOR_2_ACL
+  501:
+  502:				;---------------------------------------------------------------
+  503:	  03A7	71 B4		CL2: ACALL CL_MAIN
+  504:	  03A9	02 03 28	LJMP MOTOR_2
+  505:	  03AC	71 C3		ACL2: ACALL ACL_MAIN ;rotation anticlockwise
+  506:	  03AE	02 03 6C	LJMP MOTOR_2_ACL ;continue with the same RPM
+  507:				;---------------------------------------------------------------
+  508:	  03B1	02 00 F7	LC1: LJMP ML ;used as a redirect
+  509:				;---------------------------------------------------------------
+  510:				;CLOCKWISE ROTATION---------------------------------------------
+  511:	  03B4			CL_MAIN:
+  512:	  03B4	7A 01		MOV R2, #01H
+  513:	  03B6	11 B1		ACALL COMMAND
+  514:	  03B8	90 05 4F	MOV DPTR, #CLKWISE
+  515:	  03BB	11 94		ACALL LCD_PRINT
+  516:	  03BD	90 06 3A	MOV DPTR, #ACLM
+  517:	  03C0	11 94		ACALL LCD_PRINT
+  518:	  03C2	22		RET
+  519:				;ANTI-CLOCKWISE ROTATION----------------------------------------
+  520:	  03C3			ACL_MAIN:
+  521:	  03C3	7A 01		MOV R2, #01H
+  522:	  03C5	11 B1		ACALL COMMAND
+  523:	  03C7	90 05 59	MOV DPTR, #ANTICLK
+  524:	  03CA	11 94		ACALL LCD_PRINT
+  525:	  03CC	90 06 4B	MOV DPTR, #CLM
+  526:	  03CF	11 94		ACALL LCD_PRINT
+  527:	  03D1	22		RET
+  528:				;---------------------------------------------------------------
+  529:
+  530:	  03D2			MOTOR_3: ;75% DUTY CYCLE
+  531:	  03D2	C2 84		CLR LED
+  532:	  03D4	C2 80		CLR LED25
+  533:	  03D6	C2 81		CLR LED50
+  534:	  03D8	C2 83		CLR  LED100
+  535:	  03DA	D2 82		SETB LED75
+  536:	  03DC	D2 90		SETB P1.0
+  537:	  03DE	D2 93		SETB P1.3
+  538:	  03E0	C2 94		CLR P1.4
+  539:				;SETB LED75
+  540:	  03E2	51 13		ACALL DELAYM
+  541:	  03E4	51 13		ACALL DELAYM
+  542:	  03E6	51 13		ACALL DELAYM
+  543:	  03E8	C2 93		CLR P1.3
+  544:	  03EA	C2 94		CLR P1.4
+  545:	  03EC	51 13		ACALL DELAYM
+  546:	  03EE	30 B4 1F	JNB P3.4,LL1_12
+  547:	  03F1	30 B5 1C	JNB P3.5,LL1_12
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 11
+
+
+
+ Line  I  Addr  Code            Source
+
+  548:	  03F4	30 B6 19	JNB P3.6,LL1_12
+  549:	  03F7	30 B7 16	JNB P3.7,LL1_12
+  550:	  03FA	D2 B0		SETB P3.0
+  551:	  03FC	C2 B3		CLR P3.3
+  552:	  03FE	30 B4 12	JNB P3.4,ACL3_1
+  553:	  0401	30 B5 AD	JNB P3.5,LC1
+  554:	  0404	30 B6 0F	JNB P3.6,CL3_1
+  555:	  0407	D2 B3		SETB P3.3
+  556:	  0409	C2 B0		CLR P3.0
+  557:	  040B	80 C5		SJMP MOTOR_3
+  558:
+  559:
+  560:	  040D	02 03 B1	LC11_1: LJMP LC1
+  561:	  0410	02 04 5F	LL1_12:LJMP LL1_1
+  562:	  0413	02 04 5A	ACL3_1:LJMP ACL3
+  563:	  0416	02 04 55	CL3_1:LJMP CL3
+  564:
+  565:	  0419			MOTOR_3_ACL: ;75% DUTY CYCLE
+  566:	  0419	C2 84		CLR LED
+  567:	  041B	C2 80		CLR LED25
+  568:	  041D	C2 81		CLR LED50
+  569:	  041F	C2 83		CLR  LED100
+  570:	  0421	D2 82		SETB LED75
+  571:	  0423	D2 90		SETB P1.0
+  572:	  0425	D2 94		SETB P1.4
+  573:	  0427	C2 93		CLR P1.3
+  574:	  0429	51 13		ACALL DELAYM
+  575:	  042B	51 13		ACALL DELAYM
+  576:	  042D	51 13		ACALL DELAYM
+  577:	  042F	C2 94		CLR P1.4
+  578:	  0431	C2 93		CLR P1.3
+  579:	  0433	51 13		ACALL DELAYM
+  580:	  0435	30 B4 27	JNB P3.4,LL1_1
+  581:	  0438	30 B5 24	JNB P3.5,LL1_1
+  582:	  043B	30 B6 21	JNB P3.6,LL1_1
+  583:	  043E	30 B7 1E	JNB P3.7,LL1_1
+  584:	  0441	D2 B0		SETB P3.0
+  585:	  0443	C2 B3		CLR P3.3
+  586:	  0445	30 B4 12	JNB P3.4,ACL3
+  587:	  0448	30 B5 C2	JNB P3.5,LC11_1
+  588:	  044B	30 B6 07	JNB P3.6,CL3
+  589:	  044E	D2 B3		SETB P3.3
+  590:	  0450	C2 B0		CLR P3.0
+  591:				;JNB P1.0, LIM3A
+  592:	  0452	02 04 19	LJMP MOTOR_3_ACL
+  593:
+  594:				;---------------------------------------------------------------
+  595:	  0455	71 B4		CL3:ACALL CL_MAIN
+  596:	  0457	02 03 D2	LJMP MOTOR_3
+  597:	  045A	71 C3		ACL3:ACALL ACL_MAIN
+  598:	  045C	02 04 19	LJMP MOTOR_3_ACL
+  599:
+  600:	  045F	02 04 9E	LL1_1: LJMP LL1_2
+  601:	  0462	02 04 0D	LC111_1: LJMP LC11_1
+  602:				;---------------------------------------------------------------
+  603:	  0465			MOTOR_4: ;KEY 'A'
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 12
+
+
+
+ Line  I  Addr  Code            Source
+
+  604:	  0465	C2 80		CLR LED25
+  605:	  0467	C2 81		CLR LED50
+  606:	  0469	C2 82		CLR LED75
+  607:	  046B	D2 83		SETB LED100
+  608:	  046D	D2 90		SETB P1.0 ;100% DUTY CYCLE
+  609:	  046F	D2 93		SETB P1.3
+  610:	  0471	C2 94		CLR P1.4
+  611:	  0473	D2 84		SETB LED ; Turn on buzzer when motor reaches 3000 RPM
+  612:
+  613:	  0475	51 13		ACALL DELAYM
+  614:	  0477	51 13		ACALL DELAYM
+  615:	  0479	51 13		ACALL DELAYM
+  616:	  047B	51 13		ACALL DELAYM
+  617:	  047D	30 B4 1E	JNB P3.4,LL1_2
+  618:	  0480	30 B5 1B	JNB P3.5,LL1_2
+  619:	  0483	30 B6 18	JNB P3.6,LL1_2
+  620:	  0486	30 B7 15	JNB P3.7,LL1_2
+  621:	  0489	D2 B0		SETB P3.0
+  622:	  048B	C2 B3		CLR P3.3
+  623:	  048D	30 B4 11	JNB P3.4,ACL4_1
+  624:	  0490	30 B5 CF	JNB P3.5,LC111_1
+  625:	  0493	30 B6 0E	JNB P3.6,CL4_1
+  626:	  0496	D2 B3		SETB P3.3
+  627:	  0498	C2 B0		CLR P3.0
+  628:				;JNB P1.0, LIM4
+  629:	  049A	C2 90		CLR P1.0
+  630:	  049C	80 C7		SJMP MOTOR_4
+  631:
+  632:	  049E	02 04 ED	LL1_2: LJMP LL1
+  633:	  04A1	02 04 E9	ACL4_1:LJMP ACL4
+  634:	  04A4	02 04 E4	CL4_1: LJMP CL4
+  635:	  04A7	02 04 62	LC111_2: LJMP LC111_1
+  636:
+  637:	  04AA			MOTOR_4_ACL: ;KEY 'A'
+  638:	  04AA	C2 80		CLR LED25
+  639:	  04AC	C2 81		CLR LED50
+  640:	  04AE	C2 82		CLR LED75
+  641:	  04B0	D2 83		SETB LED100
+  642:	  04B2	D2 90		SETB P1.0 ;100% DUTY CYCLE
+  643:	  04B4	D2 94		SETB P1.4
+  644:	  04B6	C2 93		CLR P1.3
+  645:	  04B8	D2 84		SETB LED ; Turn on buzzer when motor reaches 3000 RPM
+  646:	  04BA	51 13		ACALL DELAYM
+  647:	  04BC	51 13		ACALL DELAYM
+  648:	  04BE	51 13		ACALL DELAYM
+  649:	  04C0	51 13		ACALL DELAYM
+  650:	  04C2	30 B4 28	JNB P3.4,LL1
+  651:	  04C5	30 B5 25	JNB P3.5,LL1
+  652:	  04C8	30 B6 22	JNB P3.6,LL1
+  653:	  04CB	30 B7 1F	JNB P3.7,LL1
+  654:	  04CE	D2 B0		SETB P3.0
+  655:	  04D0	C2 B3		CLR P3.3
+  656:	  04D2	30 B4 14	JNB P3.4,ACL4
+  657:	  04D5	30 B5 CF	JNB P3.5,LC111_2
+  658:	  04D8	30 B6 09	JNB P3.6,CL4
+  659:	  04DB	D2 B3		SETB P3.3
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 13
+
+
+
+ Line  I  Addr  Code            Source
+
+  660:	  04DD	C2 B0		CLR P3.0
+  661:				;JNB P1.0, LIM4A
+  662:	  04DF	C2 90		CLR P1.0
+  663:	  04E1	02 04 AA	LJMP MOTOR_4_ACL
+  664:
+  665:				;---------------------------------------------------------------
+  666:	  04E4	71 B4		CL4:ACALL CL_MAIN
+  667:	  04E6	02 04 65	LJMP MOTOR_4
+  668:	  04E9	71 C3		ACL4:ACALL ACL_MAIN
+  669:	  04EB	80 BD		SJMP MOTOR_4_ACL
+  670:				;---------------------------------------------------------------
+  671:	  04ED	02 00 F7	LL1:LJMP ML
+  672:				;---------------------------------------------------------------
+  673:
+  674:				;Display messages----------------------------------------------------
+  675:	  04F0	45 4E 54 45	INT_MSG: DB 'ENTER RPM LEVEL',0 ;INITIAL MESSAGE
+	  04F4	52 20 52 50
+	  04F8	4D 20 4C 45
+	  04FC	56 45 4C 00
+  676:	  0500	4D 4F 54 4F	OFF_MSG: DB 'MOTOR OFF',0
+	  0504	52 20 4F 46
+	  0508	46 00
+  677:	  050A	4C 31 3A 37	LVL1: DB 'L1:75 RPM,25%PW',0
+	  050E	35 20 52 50
+	  0512	4D 2C 32 35
+	  0516	25 50 57 00
+  678:	  051A	4C 32 3A 31	LVL2: DB 'L2:150 RPM,50%PW ',0
+	  051E	35 30 20 52
+	  0522	50 4D 2C 35
+	  0526	30 25 50 57
+	  052A	20 00
+  679:	  052C	4C 33 3A 32	LVL3: DB 'L3:225 RPM,75%PW ',0
+	  0530	32 35 20 52
+	  0534	50 4D 2C 37
+	  0538	35 25 50 57
+	  053C	20 00
+  680:	  053E	4C 34 3A 33	LVL4: DB 'L4:300 RPM,100PW',0
+	  0542	30 30 20 52
+	  0546	50 4D 2C 31
+	  054A	30 30 50 57
+	  054E	00
+  681:	  054F	43 4C 4F 43	CLKWISE: DB 'CLOCKWISE',0
+	  0553	4B 57 49 53
+	  0557	45 00
+  682:	  0559	41 4E 54 49	ANTICLK: DB 'ANTI-CLOCKWISE',0
+	  055D	2D 43 4C 4F
+	  0561	43 4B 57 49
+	  0565	53 45 00
+  683:				;---------------------------------------------------------------
+  684:	  0568	45 45 45 2D	MSG:    DB 'EEE-4706',0
+	  056C	34 37 30 36
+	  0570	00
+  685:	  0571	41 31 2D 47	MSG2:   DB 'A1-GROUP-02',0
+	  0575	52 4F 55 50
+	  0579	2D 30 32 00
+  686:	  057D	41 46 49 46	MSG3:   DB 'AFIF',0
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 14
+
+
+
+ Line  I  Addr  Code            Source
+
+	  0581	00
+  687:	  0582	49 44 3A 31	MSG4:   DB 'ID:141',0
+	  0586	34 31 00
+  688:	  0589	54 41 53 4E	MSG5:   DB 'TASNIA',0
+	  058D	49 41 00
+  689:	  0590	49 44 3A 31	MSG6:   DB 'ID:113',0
+	  0594	31 33 00
+  690:	  0597	46 41 42 42	MSG7:   DB 'FABBIHA',0
+	  059B	49 48 41 00
+  691:	  059F	49 44 3A 31	MSG8:   DB 'ID:105',0
+	  05A3	30 35 00
+  692:	  05A6	46 41 52 55	MSG9:   DB 'FARUK',0
+	  05AA	4B 00
+  693:	  05AC	49 44 3A 31	MSG10:   DB 'ID:133',0
+	  05B0	33 33 00
+  694:	  05B3	53 48 45 52	MSG11:   DB 'SHERIFFO',0
+	  05B7	49 46 46 4F
+	  05BB	00
+  695:	  05BC	49 44 3A 31	MSG12:   DB 'ID:153',0
+	  05C0	35 33 00
+  696:	  05C3	4F 56 45 52	MSG13:   DB 'OVERLOAD!!',0
+	  05C7	4C 4F 41 44
+	  05CB	21 21 00
+  697:	  05CE	47 4F 49 4E	MSG14:   DB 'GOING TO STOP',0
+	  05D2	47 20 54 4F
+	  05D6	20 53 54 4F
+	  05DA	50 00
+  698:	  05DC	54 48 45 20	MSG15:   DB 'THE MOTOR',0
+	  05E0	4D 4F 54 4F
+	  05E4	52 00
+  699:	  05E6	44 43 20 4D	START1: DB 'DC MOTOR WITH',0
+	  05EA	4F 54 4F 52
+	  05EE	20 57 49 54
+	  05F2	48 00
+  700:	  05F4	53 50 45 45	START2: DB 'SPEED CONTROL',0
+	  05F8	44 20 43 4F
+	  05FC	4E 54 52 4F
+	  0600	4C 00
+  701:	  0602	4D 4F 54 4F	MSG16:   DB 'MOTOR IS OFF',0
+	  0606	52 20 49 53
+	  060A	20 4F 46 46
+	  060E	00
+  702:	  060F	4D 4F 54 4F	ACTIVE: DB 'MOTOR IS ON',0
+	  0613	52 20 49 53
+	  0617	20 4F 4E 00
+  703:				;DENY_MSG: DB 'WRONG PASSWORD',0
+  704:				;TRY_AGN: DB 'TRY AGAIN',0
+  705:	  061B	4C 45 56 45	LEVEL: DB 'LEVELS: 1 TO A',0
+	  061F	4C 53 3A 20
+	  0623	31 20 54 4F
+	  0627	20 41 00
+  706:	  062A	50 52 45 53	STOP: DB 'PRESS 0 TO STOP',0
+	  062E	53 20 30 20
+	  0632	54 4F 20 53
+	  0636	54 4F 50 00
+  707:	  063A	41 4E 54 49	ACLM: DB 'ANTICLK: PRESS *',0
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 15
+
+
+
+ Line  I  Addr  Code            Source
+
+	  063E	43 4C 4B 3A
+	  0642	20 50 52 45
+	  0646	53 53 20 2A
+	  064A	00
+  708:	  064B	43 4C 4B 20	CLM: DB 'CLK    : PRESS #',0
+	  064F	20 20 20 3A
+	  0653	20 50 52 45
+	  0657	53 53 20 23
+	  065B	00
+  709:	  065C	41 43 4C 3A	ACLCL: DB 'ACL: *     CL: #',0
+	  0660	20 2A 20 20
+	  0664	20 20 20 43
+	  0668	4C 3A 20 23
+	  066C	00
+  710:				END
+  711:
+
+
+
+
+
+                     register banks used:  ---
+
+                     no errors
+
+
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 16
+
+
+
+
+
+	       L I S T   O F   S Y M B O L S
+	       =============================
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+??ASEM_51			  NUMBER    8051
+??VERSION			  NUMBER    0130
+AC				  BIT	      D6
+ACC				  DATA	      E0
+ACL1				  CODE	    0323	 438
+ACL1_1				  CODE	    02B5	 382
+ACL2				  CODE	    03AC	 505
+ACL2_1				  CODE	    0366	 471
+ACL3				  CODE	    045A	 597
+ACL3_1				  CODE	    0413	 562
+ACL4				  CODE	    04E9	 668
+ACL4_1				  CODE	    04A1	 633
+ACLCL				  CODE	    065C	 709
+ACLM				  CODE	    063A	 707
+ACL_MAIN			  CODE	    03C3	 520
+ACTIVE				  CODE	    060F	 702
+ANTICLK				  CODE	    0559	 682
+B				  DATA	      F0
+CC1				  CODE	    0105	 164
+CC2				  CODE	    0117	 175
+CC3				  CODE	    0129	 186
+CC4				  CODE	    013B	 197
+CL1				  CODE	    031E	 436
+CL1_1				  CODE	    02B8	 383
+CL2				  CODE	    03A7	 503
+CL2_1				  CODE	    0369	 472
+CL3				  CODE	    0455	 595
+CL3_1				  CODE	    0416	 563
+CL4				  CODE	    04E4	 666
+CL4_1				  CODE	    04A4	 634
+CLKWISE				  CODE	    054F	 681
+CLM				  CODE	    064B	 708
+CL_MAIN				  CODE	    03B4	 511
+COMMAND				  CODE	    00B1	 111
+CY				  BIT	      D7
+D1				  CODE	    00C1	 122
+DECISION			  CODE	    00CB	 129
+DELAY				  CODE	    00BE	 120
+DELAYM				  CODE	    0213	 301
+DISPLAY				  CODE	    00A6	 103
+DPH				  DATA	      83
+DPL				  DATA	      82
+EA				  BIT	      AF
+EN				  NUMBER    0092	  11
+ES				  BIT	      AC
+ET0				  BIT	      A9
+ET1				  BIT	      AB
+EX0				  BIT	      A8
+EX1				  BIT	      AA
+EXIT				  CODE	    00A1	  98
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 17
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+EXTI0				  CODE	    0003
+EXTI1				  CODE	    0013
+F0				  BIT	      D5
+H2				  CODE	    0217	 304
+H3				  CODE	    0219	 305
+HL				  CODE	    0215	 303
+IE				  DATA	      A8
+IE0				  BIT	      89
+IE1				  BIT	      8B
+INITIALIZATION			  CODE	    0006	  13
+INT0				  BIT	      B2
+INT1				  BIT	      B3
+INT_MSG				  CODE	    04F0	 675
+IP				  DATA	      B8
+IT0				  BIT	      88
+IT1				  BIT	      8A
+JMP_TO_0			  CODE	    014E	 207
+JMP_TO_1			  CODE	    0151	 208
+JMP_TO_2			  CODE	    0154	 209
+JMP_TO_3			  CODE	    0157	 210
+JMP_TO_4			  CODE	    015A	 211
+JMP_TO_5			  CODE	    015D	 212
+JMP_TO_6			  CODE	    0160	 213
+JMP_TO_7			  CODE	    0163	 214
+JMP_TO_8			  CODE	    0166	 215
+JMP_TO_9			  CODE	    0169	 216
+JMP_TO_A			  CODE	    016C	 217
+JMP_TO_B			  CODE	    016F	 218
+JMP_TO_C			  CODE	    0172	 219
+JMP_TO_D			  CODE	    0175	 220
+JMP_TO_E			  CODE	    0178	 221
+JMP_TO_F			  CODE	    017B	 222
+LC				  CODE	    0220	 310
+LC1				  CODE	    03B1	 508
+LC111_1				  CODE	    0462	 601
+LC111_2				  CODE	    04A7	 635
+LC11_1				  CODE	    040D	 560
+LC1_1				  CODE	    031B	 434
+LC1_2				  CODE	    02B2	 381
+LCD_INIT			  CODE	    0012	  21
+LCD_PRINT			  CODE	    0094	  88
+LED				  NUMBER    0084	   4
+LED100				  NUMBER    0083	   8
+LED25				  NUMBER    0080	   5
+LED50				  NUMBER    0081	   6
+LED75				  NUMBER    0082	   7
+LEVEL				  CODE	    061B	 705
+LL				  CODE	    0255	 335
+LL1				  CODE	    04ED	 671
+LL1_1				  CODE	    045F	 600
+LL1_12				  CODE	    0410	 561
+LL1_2				  CODE	    049E	 632
+LL_1				  CODE	    0318	 433
+LL_12				  CODE	    0363	 469
+LL_2				  CODE	    02BB	 384
+LOOP				  CODE	    0094	  89
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 18
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+LVL1				  CODE	    050A	 677
+LVL2				  CODE	    051A	 678
+LVL3				  CODE	    052C	 679
+LVL4				  CODE	    053E	 680
+ML				  CODE	    00F7	 156
+MOTOR_0				  CODE	    0226	 313
+MOTOR_1				  CODE	    0258	 337
+MOTOR_1_ACL			  CODE	    02BE	 386
+MOTOR_2				  CODE	    0328	 441
+MOTOR_2_ACL			  CODE	    036C	 474
+MOTOR_3				  CODE	    03D2	 530
+MOTOR_3_ACL			  CODE	    0419	 565
+MOTOR_4				  CODE	    0465	 603
+MOTOR_4_ACL			  CODE	    04AA	 637
+MOTOR_ROTATION			  CODE	    00CE	 133
+MSG				  CODE	    0568	 684
+MSG10				  CODE	    05AC	 693
+MSG11				  CODE	    05B3	 694
+MSG12				  CODE	    05BC	 695
+MSG13				  CODE	    05C3	 696
+MSG14				  CODE	    05CE	 697
+MSG15				  CODE	    05DC	 698
+MSG16				  CODE	    0602	 701
+MSG2				  CODE	    0571	 685
+MSG3				  CODE	    057D	 686
+MSG4				  CODE	    0582	 687
+MSG5				  CODE	    0589	 688
+MSG6				  CODE	    0590	 689
+MSG7				  CODE	    0597	 690
+MSG8				  CODE	    059F	 691
+MSG9				  CODE	    05A6	 692
+M_0				  CODE	    017E	 225
+M_1				  CODE	    018F	 233
+M_2				  CODE	    01A3	 243
+M_3				  CODE	    01B7	 253
+M_A				  CODE	    01CB	 263
+M_E				  CODE	    01F9	 286
+M_F				  CODE	    01DF	 273
+OFF_MSG				  CODE	    0500	 676
+OV				  BIT	      D2
+P				  BIT	      D0
+P0				  DATA	      80
+P1				  DATA	      90
+P2				  DATA	      A0
+P3				  DATA	      B0
+PCON				  DATA	      87
+PS				  BIT	      BC
+PSW				  DATA	      D0
+PT0				  BIT	      B9
+PT1				  BIT	      BB
+PX0				  BIT	      B8
+PX1				  BIT	      BA
+RB8				  BIT	      9A
+RD				  BIT	      B7
+REN				  BIT	      9C
+RESET				  CODE	    0000
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 19
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+RI				  BIT	      98
+RS				  NUMBER    0091	  10
+RS0				  BIT	      D3
+RS1				  BIT	      D4
+RXD				  BIT	      B0
+SBUF				  DATA	      99
+SCON				  DATA	      98
+SINT				  CODE	    0023
+SM0				  BIT	      9F
+SM1				  BIT	      9E
+SM2				  BIT	      9D
+SP				  DATA	      81
+START1				  CODE	    05E6	 699
+START2				  CODE	    05F4	 700
+STARTUP_MOTOR			  CODE	    00D4	 138
+STOP				  CODE	    062A	 706
+T0				  BIT	      B4
+T1				  BIT	      B5
+TB8				  BIT	      9B
+TCON				  DATA	      88
+TF0				  BIT	      8D
+TF1				  BIT	      8F
+TH0				  DATA	      8C
+TH1				  DATA	      8D
+TI				  BIT	      99
+TIMER0				  CODE	    000B
+TIMER1				  CODE	    001B
+TL0				  DATA	      8A
+TL1				  DATA	      8B
+TMOD				  DATA	      89
+TR0				  BIT	      8C
+TR1				  BIT	      8E
+TXD				  BIT	      B1
+WR				  BIT	      B6
